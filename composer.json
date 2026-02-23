@@ -1,0 +1,21 @@
+{
+    "name": "moddril/modularsystem",
+    "description": "Laravel Modular Domain Package",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "ModDril\\modularSystem\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ModDril\\modularSystem\\ModDrilServiceProvider"
+            ]
+        }
+    }
+}
