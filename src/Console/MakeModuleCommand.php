@@ -1,6 +1,6 @@
 <?php
 
-namespace YourName\Modular\Console;
+namespace ModDril\modularSystem\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
