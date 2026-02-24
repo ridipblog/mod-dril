@@ -12,40 +12,76 @@ class MakeModuleCommand extends Command
 
     public function handle()
     {
-        $name = $this->argument('name');
-        $basePath = app_path("Domains/{$name}");
 
-        if (File::exists($basePath)) {
-            $this->error("Module already exists.");
-            return;
+        $domain = ucfirst($this->argument('name'));
+        $basePath = app_path("Domains/{$domain}");
+
+        if (File::exists($basePath) && File::isDirectory($basePath)) {
+            $this->error("Domain already exists.");
+            return Command::FAILURE;
         }
 
-        File::makeDirectory($basePath . '/Providers', 0755, true);
-        File::makeDirectory($basePath . '/Http/Controllers', 0755, true);
-        File::makeDirectory($basePath . '/Routes', 0755, true);
+        $folders = [
+            'Http/Controllers',
+            'Http/Requests',
+            'Services',
+            'Repositories',
+            'Providers',
+            'Routes',
+            'Views',
+        ];
+
+        foreach ($folders as $folder) {
+            File::makeDirectory("{$basePath}/{$folder}", 0755, true, true);
+        }
+
+        File::put(
+            $basePath . "/Routes/web.php",
+            $this->generateRouteStub()
+        );
 
         // Create ServiceProvider file
         File::put(
-            $basePath . "/Providers/{$name}ServiceProvider.php",
-            $this->getServiceProviderStub($name)
+            $basePath . "/Providers/{$domain}ServiceProvider.php",
+            $this->getServiceProviderStub($domain)
         );
+        $this->updateModuleManifest($domain);
 
-        $this->info("Module {$name} created successfully.");
+        $this->info("Module {$domain} created successfully.");
     }
 
-    protected function getServiceProviderStub($name)
+    // *** Generate main route file ***
+    protected function generateRouteStub(): string
     {
         return "<?php
+use Illuminate\Support\Facades\Route;
+";
+    }
 
-namespace App\\Domains\\{$name}\\Providers;
+    protected function getServiceProviderStub(string $domain): string
+    {
+        $viewName = strtolower($domain);
+        return <<<PHP
+<?php
+
+namespace App\\Domains\\{$domain}\\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class {$name}ServiceProvider extends ServiceProvider
+class {$domain}ServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        //
+        // Load routes automatically
+        \$this->loadRoutesFrom(
+            app_path('Domains/{$domain}/Routes/web.php')
+        );
+
+         // Load views automatically
+        \$this->loadViewsFrom(
+            app_path('Domains/{$domain}/Views'),
+            '{$viewName}'
+        );
     }
 
     public function register()
@@ -53,6 +89,29 @@ class {$name}ServiceProvider extends ServiceProvider
         //
     }
 }
-";
+PHP;
+    }
+
+    // *** Update modules ***
+    protected function updateModuleManifest(string $domain): void
+    {
+        $manifestPath = app_path('Domains/modules.json');
+
+        if (!File::exists($manifestPath)) {
+            File::put($manifestPath, json_encode([], JSON_PRETTY_PRINT));
+        }
+
+        $modules = json_decode(File::get($manifestPath), true);
+
+        if (!isset($modules[$domain])) {
+            $modules[$domain] = [
+                'enabled' => true
+            ];
+
+            File::put(
+                $manifestPath,
+                json_encode($modules, JSON_PRETTY_PRINT)
+            );
+        }
     }
 }
