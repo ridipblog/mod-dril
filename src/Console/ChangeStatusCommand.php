@@ -15,7 +15,7 @@ class ChangeStatusCommand extends Command
         $statusInput = strtolower($this->argument('status'));
 
         if (!in_array($statusInput, ['enabled', 'disabled'], true)) {
-            $this->error('Status must be either true or false.');
+            $this->error('Status must be either enabled or disabled.');
             return Command::FAILURE;
         }
 

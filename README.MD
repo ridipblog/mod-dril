@@ -82,8 +82,8 @@ php artisan module:status {domain} {status}
 Example:
 
 ~~~bash
-php artisan module:status User true
-php artisan module:status User false
+php artisan module:status User enabled
+php artisan module:status User disabled
 ~~~
 
 ---
