@@ -73,6 +73,36 @@ app/Domains/modules.json
 
 ---
 
+## 🎮 Create a Module Controller
+
+You can create a controller inside a specific domain using:
+
+~~~bash
+php artisan make:module-controller {domain} {controller}
+~~~
+
+### Examples
+
+Create a simple controller:
+
+~~~bash
+php artisan make:module-controller User UserController
+~~~
+
+Create a controller inside subfolders:
+
+~~~bash
+php artisan make:module-controller User Admin/UserController
+~~~
+
+This will generate:
+Or if using subfolders:
+If the directory does not exist, it will be created automatically.
+
+If the controller already exists, the command will prevent overwriting it.
+
+---
+
 ## 🔄 Enable / Disable Module
 
 ~~~bash

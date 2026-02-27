@@ -34,6 +34,9 @@ class ModDrilServiceProvider extends ServiceProvider
             $this->commands([
                 Console\ModuleListCommand::class,
             ]);
+            $this->commands([
+                Console\MakeModuleController::class,
+            ]);
         }
     }
 
